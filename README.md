@@ -60,7 +60,7 @@ uvicorn main:app --reload
 
 ### Possible Improvements
 
-Replace CSVs with a database (PostgreSQL, MongoDB)
+Replace CSVs with a database (PostgreSQL, MongoDB), 
 Add multilingual support for critiques
 
 ### Note
