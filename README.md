@@ -21,7 +21,7 @@ Tech choices & rationale
 | Language               | Python 3.12              |
 
 - FastAPI backend with a `/similar-critiques` endpoint.
-  It lightweight, async-friendly, and easy to test
+  It is lightweight, async-friendly, and easy to test
 - Semantic embeddings using [SentenceTransformers](https://www.sbert.net/) (`all-MiniLM-L6-v2`).
   It produces high-quality semantic embeddings for short-to-medium text like reviews.produces high-quality semantic embeddings for short-to-medium text like reviews.
 - Cosine similarity for ranking critiques
