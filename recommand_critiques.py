@@ -1,0 +1,87 @@
+from fastapi import FastAPI
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+import numpy as np
+import os
+import re
+
+app = FastAPI(title = "Critiques API", description = "API pour gérer les critiques de films")
+
+# First step will be to load the 2 datasets (Fight Club & Interstellar) and then make sure the columns / features match.
+
+fightclub = pd.read_csv('data/fight_club_critiques.csv')
+interstellar = pd.read_csv('data/interstellar_critiques.csv')
+
+# I loaded them with the "data/" because I created a folder named "data" in the same repository as this script and put the csv files in there.  
+# I checked the columns and renamed some of them to make things easier for me. 
+
+db_1 = fightclub.rename(columns = {"id": "review_id", "review_content":"texte"})
+db_1["film_id"] = 1 # I added a film_id column to each dataset to be able to filter later. 1 for Fight Club, 2 for Interstellar.
+db_1= db_1[["review_id", "film_id", "user_id", "texte"]]
+
+db_2 = interstellar.rename(columns = {"id": "review_id", "review_content":"texte"})
+db_2["film_id"] = 2
+db_2= db_2[["review_id", "film_id", "user_id", "texte"]]
+
+df = pd.concat([db_1, db_2], ignore_index=True) # This will combine the datasets into one dataframe. You can add more datasets later.
+
+
+# Convert to a list of dicts for easier handling
+critiques = df.to_dict(orient="records")
+
+# I then did some text preprocessing here to remove any unwanted characters, lowercasing, etc.
+def preprocess(text: str) -> str:
+    text = text.lower()
+    text = re.sub(r"[^a-zA-ZÀ-ÿ0-9\s]", "", text)
+    return text.strip()
+
+# Then I embedded the critiques using SentenceTransformer.
+model = SentenceTransformer('all-MiniLM-L6-v2')
+embeddings = {c["review_id"]: model.encode(preprocess(c["texte"])) for c in critiques} 
+np.save("embeddings.npy", embeddings)
+
+# I did some reseaerch and found that this can take a while the first time if you have lots of critiques.
+# If you have a file named "embeddings.npy" in the same directory as the script, it will load the embeddings from there instead of recomputing them.
+
+#if os.path.exists("embeddings.npy"):
+    #embeddings = np.load("embeddings.npy", allow_pickle=True).item()
+#else:
+    # Use the line above to compute embeddings if the file doesn't exist.
+
+# Then I proceeded to add embeddings to each critiques
+for critique in critiques:
+    critique["embedding"] = embeddings[critique["review_id"]]
+
+# Now, to impliment the API endpoint for recommendations
+@app.get("/similar-critiques")
+def get_similar_critiques(critique_id: int, top_k: int = 3):
+    # This is to find the critique the user is interested in
+    target = next((c for c in critiques if c["review_id"] == critique_id), None)
+    if not target:
+        return {"error": "Oups, je n'ai pas trouvé cette critique."}
+
+    # This is to make sure it only compare to other critiques for the same movie
+    same_film = [c for c in critiques if c["film_id"] == target["film_id"] and c["review_id"] != critique_id]
+    if not same_film:
+        return {"message": "Pas d'autres critiques pour ce film, désolé !"}
+
+    # Compute similarities
+    target_vec = np.array(target["embedding"]).reshape(1, -1)
+    other_vecs = np.array([c["embedding"] for c in same_film])
+    similarities = cosine_similarity(target_vec, other_vecs)[0]
+
+    # Pick the top-k most similar
+    sorted_indices = np.argsort(similarities)[::-1][:top_k]
+    similar_critiques = [same_film[i] for i in sorted_indices]
+
+    # Return a friendly summary
+    return [
+        {
+            "review_id": c["review_id"],
+            "film_id": c["film_id"],
+            "texte": c["texte"],
+            "similarité": float(similarities[i])
+        }
+        for i, c in zip(sorted_indices, similar_critiques)
+    ]
