@@ -2,6 +2,7 @@
 
 This project implements a recommendation feature for **Critiques**:  
 when a user reads a critique of a film, the system suggests **similar critiques from the same film**.
+
 Note: I used AI to help me with the "compute similarities" and "top-k most similar" part of the code, as i kept getting errors no matter how i twiked it.
 
 ---
