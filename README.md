@@ -24,7 +24,7 @@ when a user reads a critique of a film, the system suggests **similar critiques 
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 .
 ├── fightclub_critiques.csv
 ├── interstellar_critiques.csv
@@ -42,8 +42,10 @@ when a user reads a critique of a film, the system suggests **similar critiques 
 git clone https://github.com/m-armel/Senscritique/tree/main
 cd senscritique-reco
 
-2. Install dependencies
+### 2. Install dependencies
+
 pip install -r requirements.txt
+
 Minimal requirements:
 fastapi
 uvicorn
@@ -52,33 +54,16 @@ numpy
 scikit-learn
 sentence-transformers
 
-3. Run the API
+### 3. Run the API
+
 uvicorn main:app --reload
 
-📌 Usage Example
-Request
-GET http://127.0.0.1:8000/similar-critiques?critique_id=1&top_k=3
-Response
-[
-  {
-    "id": 2,
-    "film_id": 101,
-    "texte": "Violence gratuite, pas mon style",
-    "similarité": 0.81
-  },
-  {
-    "id": 4,
-    "film_id": 101,
-    "texte": "Les combats sont trop longs",
-    "similarité": 0.78
-  }
-]
-
-Possible Improvements
+### Possible Improvements
 
 Replace CSVs with a database (PostgreSQL, MongoDB)
 Add multilingual support for critiques
 
-Author
+### Author
+
 Armel Moumbe
 GitHub: @m-armel
