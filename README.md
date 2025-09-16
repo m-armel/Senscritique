@@ -39,7 +39,7 @@ when a user reads a critique of a film, the system suggests **similar critiques 
 
 ### 1. Clone the repo
 
-git clone https://github.com/m-armel/senscritique-reco.git
+git clone https://github.com/m-armel/Senscritique/tree/main
 cd senscritique-reco
 
 2. Install dependencies
