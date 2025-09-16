@@ -63,7 +63,12 @@ uvicorn main:app --reload
 Replace CSVs with a database (PostgreSQL, MongoDB)
 Add multilingual support for critiques
 
+### Note
+
+I used AI to help me with the "compute similarities" and "top-k most similar" part of the code, as i kept getting errors no matter how i twiked it.
+
 ### Author
 
 Armel Moumbe
+
 GitHub: @m-armel
