@@ -8,12 +8,31 @@ Note: I used AI to help me with the "compute similarities" and "top-k most simil
 ---
 
 ## Features
+
+Tech choices & rationale
+------------------------
+
+| Component              | Technology               |
+|------------------------|--------------------------|
+| API Framework          | FastAPI                  |
+| Embedding Model        | Sentence Transformers    |
+| Vector Search Engine   | Cosine Similarity        |
+| Data Storage           | CSV Storage              |
+| Language               | Python 3.12              |
+
 - FastAPI backend with a `/similar-critiques` endpoint
+  Reason: lightweight, async-friendly, and easy to test
 - Semantic embeddings using [SentenceTransformers](https://www.sbert.net/) (`all-MiniLM-L6-v2`)
+  Reason: produces high-quality semantic embeddings for short-to-medium text like reviews.produces high-quality semantic embeddings for short-to-medium text like reviews.
 - Cosine similarity for ranking critiques
 - Works with provided datasets (`fightclub_critiques.csv`, `interstellar_critiques.csv`)
 - Preprocessing (lowercasing, punctuation cleanup)
 - Embedding cache (`embeddings.npy`) for faster startup
+
+Privacy & Safety
+----------------
+- I did filtering by film_id server-side to make sure it returns only reviews of same film.
+- Optionally respect content moderation flags (hide NSFW / spoiler-labeled reviews)
 
 ---
 
